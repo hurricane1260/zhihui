@@ -13,6 +13,10 @@ from tornado.options import options, define
 
 define("port", default=8080, type=int, help="run on the given port")
 
+try:
+    import zhihui
+except ImportError:
+    sys.path.append(os.path.join(os.path.dirname(__file__),".."))
 
 class Application(tornado.web.Application):
     """
