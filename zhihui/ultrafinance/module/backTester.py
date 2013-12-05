@@ -4,6 +4,11 @@ Created on Dec 3, 2011
 @author: ppa
 '''
 
+import os
+import sys
+#sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+#sys.path.append('/Users/chendd/PycharmProjects/zhihui/zhihui')
+
 from ultrafinance.backTest.tickSubscriber.strategies.strategyFactory import StrategyFactory
 from ultrafinance.backTest.tradingCenter import TradingCenter
 from ultrafinance.backTest.tickFeeder import TickFeeder
@@ -17,8 +22,7 @@ from ultrafinance.backTest.metric import MetricCalculator
 from ultrafinance.backTest.indexHelper import IndexHelper
 from ultrafinance.backTest.history import History
 from ultrafinance.backTest.constant import *
-import os
-import sys
+
 
 from threading import Thread
 
