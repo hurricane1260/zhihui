@@ -6,8 +6,6 @@ Created on Dec 3, 2011
 
 import os
 import sys
-#sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-#sys.path.append('/Users/chendd/PycharmProjects/zhihui/zhihui')
 
 from ultrafinance.backTest.tickSubscriber.strategies.strategyFactory import StrategyFactory
 from ultrafinance.backTest.tradingCenter import TradingCenter
@@ -23,18 +21,20 @@ from ultrafinance.backTest.indexHelper import IndexHelper
 from ultrafinance.backTest.history import History
 from ultrafinance.backTest.constant import *
 
-
 from threading import Thread
 
 import json
 import traceback
 import logging.config
 import logging
+
 LOG = logging.getLogger()
+
 
 class BackTester(object):
     ''' back testing '''
-    def __init__(self, configFile, startTickDate = 0, startTradeDate = 0, endTradeDate = None, cash = 150000, symbolLists = None):
+
+    def __init__(self, configFile, startTickDate=0, startTradeDate=0, endTradeDate=None, cash=150000, symbolLists=None):
         LOG.debug("Loading config from %s" % configFile)
         self.__config = PyConfig()
         self.__config.setSource(configFile)
@@ -68,7 +68,9 @@ class BackTester(object):
             self.__firstSaver = StateSaverFactory.createStateSaver(saverName,
                                                                    {'db': outputDb},
                                                                    getBackTestTableName(self.__symbolLists[0],
-                                                                                        self.__config.getOption(CONF_ULTRAFINANCE_SECTION, CONF_STRATEGY_NAME)))
+                                                                                        self.__config.getOption(
+                                                                                            CONF_ULTRAFINANCE_SECTION,
+                                                                                            CONF_STRATEGY_NAME)))
 
         return self.__firstSaver
 
@@ -81,7 +83,8 @@ class BackTester(object):
     def _runOneTest(self, symbols):
         ''' run one test '''
         LOG.debug("Running backtest for %s" % symbols)
-        runner = TestRunner(self.__config, self.__mCalculator, self.__accounts, symbols, self.__startTickDate, self.__endTradeDate, self.__cash)
+        runner = TestRunner(self.__config, self.__mCalculator, self.__accounts, symbols, self.__startTickDate,
+                            self.__endTradeDate, self.__cash)
         runner.runTest()
 
     def _loadSymbols(self):
@@ -116,7 +119,7 @@ class BackTester(object):
         ''' get latest state'''
         return [json.loads(str(result)) for result in self.__getFirstSaver().getStates(0, None)]
 
-    def getLatestPlacedOrders(self, num = 20):
+    def getLatestPlacedOrders(self, num=20):
         ''' get latest placed orders of first symbol list '''
         orders = []
         for account in self.__accounts:
@@ -145,12 +148,14 @@ class BackTester(object):
         ''' print metrics '''
         LOG.info(self.getMetrics())
 
+
 class TestRunner(object):
     ''' back testing '''
+
     def __init__(self, config, mCalculator, accounts, symbols, startTickDate, endTradeDate, cash):
         self.__accountManager = AccountManager()
         self.__accountId = None
-        self.__tickFeeder = TickFeeder(start = startTickDate, end = endTradeDate)
+        self.__tickFeeder = TickFeeder(start=startTickDate, end=endTradeDate)
         self.__tradingCenter = TradingCenter()
         self.__tradingEngine = TradingEngine()
         self.__indexHelper = IndexHelper()
@@ -207,12 +212,16 @@ class TestRunner(object):
         if saverName:
             self.__saver = StateSaverFactory.createStateSaver(saverName,
                                                               {'db': outputDb},
-                                                              getBackTestTableName(self.__symbols, self.__config.getOption(CONF_ULTRAFINANCE_SECTION, CONF_STRATEGY_NAME)))
+                                                              getBackTestTableName(self.__symbols,
+                                                                                   self.__config.getOption(
+                                                                                       CONF_ULTRAFINANCE_SECTION,
+                                                                                       CONF_STRATEGY_NAME)))
 
     def _setupStrategy(self):
         ''' setup tradingEngine'''
-        strategy = StrategyFactory.createStrategy(self.__config.getOption(CONF_ULTRAFINANCE_SECTION, CONF_STRATEGY_NAME),
-                                                  self.__config.getSection(CONF_ULTRAFINANCE_SECTION))
+        strategy = StrategyFactory.createStrategy(
+            self.__config.getOption(CONF_ULTRAFINANCE_SECTION, CONF_STRATEGY_NAME),
+            self.__config.getSection(CONF_ULTRAFINANCE_SECTION))
         strategy.setSymbols(self.__symbols)
         strategy.history = self.__history
 
@@ -229,7 +238,7 @@ class TestRunner(object):
         ''' run backtest '''
         LOG.info("Running backtest for %s" % self.__symbols)
         #start trading engine
-        thread = Thread(target = self.__tradingEngine.runListener, args = ())
+        thread = Thread(target=self.__tradingEngine.runListener, args=())
         thread.setDaemon(False)
         thread.start()
 
@@ -246,8 +255,7 @@ class TestRunner(object):
         self.__mCalculator.calculate(self.__symbols, timePositions, self.__tickFeeder.iTimePositionDict)
 
         self.__tradingEngine.stop()
-        thread.join(timeout = 240)
-
+        thread.join(timeout=240)
 
 
     def _printResult(self):
@@ -273,7 +281,8 @@ def getBackTestTableName(symbols, strategyName):
 
 
 if __name__ == "__main__":
-    backTester = BackTester('backtest_sma.ini', startTickDate = 20001010, startTradeDate = 20021010, endTradeDate = 20131010)
+    print "backTest begin-------"
+    backTester = BackTester('backtest_sma.ini', startTickDate=20001010, startTradeDate=20021010, endTradeDate=20131010)
     backTester.setup()
     backTester.runTests()
     backTester.printMetrics()

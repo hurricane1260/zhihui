@@ -111,6 +111,7 @@ class SqlDAM(BaseDAM):
         ''' set up '''
         if 'db' not in setting:
             raise Exception("db not specified in setting")
+        print setting
 
         self.engine = create_engine(setting['db'], echo = self.echo)
 

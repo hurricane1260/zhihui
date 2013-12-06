@@ -2,8 +2,8 @@
 
 import os
 import csv
+from datetime import datetime
 from ultrafinance.dam.baseDAM import BaseDAM
-from ultrafinance.dam.excelLib import ExcelLib
 from ultrafinance.model import TICK_FIELDS, QUOTE_FIELDS, Quote, Tick
 from ultrafinance.lib.errors import UfException, Errors
 
@@ -35,11 +35,18 @@ class CsvDAM(BaseDAM):
         return os.path.join(self.__dir, "%s.csv" % (self.symbol,))
 
     def __readData(self, targetPath, start, end):
-        """ read data """
+        """ read data
+        :param targetPath:
+        :param start: 开始日期
+        :param end: 结束日期
+        """
         ret = []
         if not os.path.exists(targetPath):
             LOG.error("Target file doesn't exist: %s" % os.path.abspath(targetPath) )
             return ret
+
+        d_start = datetime.strftime(start, "%Y.%m.%d")
+        d_end = datetime.strftime(end, "%Y.%m.%d")
 
         with os.open(targetPath, 'rb') as csvfile:
             csv_reader = csv.reader(csvfile)
@@ -54,11 +61,15 @@ class CsvDAM(BaseDAM):
             raise UfException(Errors.FILE_EXIST, "can't write to a existing file") #because xlwt doesn't support it
 
         with os.open(targetPath, 'wb') as csvfile:
-            csv_writer = csvfile.writerows(rows)
+            csv_writer = csvfile.writer(csvfile)
+            csv_writer.writerows(rows)
 
 
     def readQuotes(self, start, end):
-        """ read quotes """
+        """ read quotes
+        :param start:开始日期
+        :param end: 结束日期
+        """
         quotes = self.__readData(self.targetPath(), start, end)
         return [Quote(*quote) for quote in quotes]
 
