@@ -57,6 +57,7 @@ class ExcelDAM(BaseDAM):
             low, high = self.__findRange(excel, start, end)
 
             for index in range(low, high + 1):
+                print excel.readRow(index)
                 ret.append(excel.readRow(index))
 
         return ret
