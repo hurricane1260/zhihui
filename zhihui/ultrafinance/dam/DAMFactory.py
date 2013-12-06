@@ -20,6 +20,9 @@ class DAMFactory(object):
         elif 'excel' == damType:
             from ultrafinance.dam.excelDAM import ExcelDAM
             dam = ExcelDAM()
+        elif 'csv' == damType:
+            from ultrafinance.dam.csvDAM import CsvDAM
+            dam = CsvDAM()
         elif 'hbase' == damType:
             from ultrafinance.dam.hbaseDAM import HBaseDAM
             dam = HBaseDAM()
@@ -36,4 +39,4 @@ class DAMFactory(object):
     @staticmethod
     def getAvailableTypes():
         ''' return all available types '''
-        return ['yahoo', 'google', 'excel', 'hbase', 'sql']
+        return ['yahoo', 'google', 'excel', 'csv', 'hbase', 'sql']
