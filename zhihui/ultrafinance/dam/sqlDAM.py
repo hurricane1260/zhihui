@@ -42,14 +42,14 @@ class QuoteSql(Base):
     __tablename__ = 'quotes'
 
     id = Column(Integer, Sequence('user_id_seq'), primary_key = True)
-    symbol = Column(String(12))
-    time = Column(Integer)
-    open = Column(Float)
-    high = Column(Float)
-    low = Column(Float)
-    close = Column(Float)
-    volume = Column(Integer)
-    adjClose = Column(Float)
+    symbol = Column(String(12), Sequence('symbol'))
+    time = Column(Integer, Sequence('time'))
+    open = Column(Float, Sequence('open'))
+    high = Column(Float, Sequence('high'))
+    low = Column(Float, Sequence('low'))
+    close = Column(Float, Sequence('close'))
+    volume = Column(Integer, Sequence('volume'))
+    adjClose = Column(Float, Sequence('adjClose'))
 
     def __init__(self, symbol, time, open, high, low, close, volume, adjClose):
         ''' constructor '''
@@ -70,13 +70,13 @@ class TickSql(Base):
     __tablename__ = 'ticks'
 
     id = Column(Integer, Sequence('user_id_seq'), primary_key = True)
-    symbol = Column(String(12))
-    time = Column(Integer)
-    open = Column(Float)
-    high = Column(Float)
-    low = Column(Float)
-    close = Column(Float)
-    volume = Column(Integer)
+    symbol = Column(String(12), Sequence('symbol'))
+    time = Column(Integer, Sequence('time'))
+    open = Column(Float, Sequence('open'))
+    high = Column(Float, Sequence('high'))
+    low = Column(Float, Sequence('low'))
+    close = Column(Float, Sequence('close'))
+    volume = Column(Integer, Sequence('volume'))
 
     def __init__(self, symbol, time, open, high, low, close, volume):
         ''' constructor '''
@@ -199,9 +199,7 @@ class SqlDAM(BaseDAM):
             symbolChunks = splitListEqually(symbols, 100)
             for chunk in symbolChunks:
                 rows = session.query(QuoteSql.symbol, QuoteSql.time, QuoteSql.close, QuoteSql.volume,
-                                     QuoteSql.low, QuoteSql.high).filter(and_(QuoteSql.symbol.in_(chunk),
-                                                                              QuoteSql.time >= int(start),
-                                                                              QuoteSql.time < int(end)))
+                                     QuoteSql.low, QuoteSql.high)
 
                 for row in rows:
                     if row.time not in ret:

@@ -46,8 +46,8 @@ class SMAStrategy(BaseStrategy):
         self.__buyOrder = None
 
         self.__smaShort = Sma(10)
-        self.__smaMid = Sma(60)
-        self.__smaLong = Sma(300)
+        self.__smaMid = Sma(20)
+        self.__smaLong = Sma(60)
 
         #state of privious day
         self.__previousTick = None

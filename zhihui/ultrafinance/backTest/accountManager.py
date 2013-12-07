@@ -54,7 +54,7 @@ class AccountManager(object):
             self.__accountPositions[accountId].append((curTime, position))
             #record
             if self.saver:
-                self.saver.write(curTime, STATE_SAVER_ACCOUNT, position)
+                self.saver.write(curTime, STATE_SAVER_ACCOUNT, accountId)
                 self.saver.write(curTime, STATE_SAVER_HOLDING_VALUE, holdingValue)
 
             if position < 0:

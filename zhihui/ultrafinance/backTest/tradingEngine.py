@@ -75,10 +75,11 @@ class TradingEngine(object):
     #TODO: in real time trading, change this function
     def runListener(self):
         ''' execute func '''
+        LOG.info("Begin tradingEngine->runListener...")
 
         while True:
             if self.__stop:
-                LOG.debug("Stopping trading engine...")
+                LOG.info("Stopping tradingEngine->runListener...")
                 self._complete()
                 break
 
@@ -92,6 +93,7 @@ class TradingEngine(object):
                 if timeTicksTuple:
                     self.__curTime = timeTicksTuple[0]
                     self._tickUpdate(timeTicksTuple)
+                    # LOG.info("tradingEngine runListener _tickUpdate")
 
                 updatedOrderDict = self.orderProxy.getUpdatedOrder()
                 placedOrderDict = self.orderProxy.getPlacedOrder()

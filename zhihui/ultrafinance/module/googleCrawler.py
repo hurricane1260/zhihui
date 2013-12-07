@@ -40,7 +40,7 @@ class GoogleCrawler(object):
         return {'db': self.sqlLocation}
 
     def __getOutputSql(self):
-        return path.join("/"
+        return path.join("../../"
                          "data",
                          "stock.sqlite")
 

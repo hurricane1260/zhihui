@@ -237,6 +237,7 @@ class TestRunner(object):
     def _execute(self):
         ''' run backtest '''
         LOG.info("Running backtest for %s" % self.__symbols)
+
         #start trading engine
         thread = Thread(target=self.__tradingEngine.runListener, args=())
         thread.setDaemon(False)
@@ -256,6 +257,7 @@ class TestRunner(object):
 
         self.__tradingEngine.stop()
         thread.join(timeout=240)
+        LOG.info("Stop backtest for %s" % self.__symbols)
 
 
     def _printResult(self):
@@ -282,7 +284,7 @@ def getBackTestTableName(symbols, strategyName):
 
 if __name__ == "__main__":
     print "backTest begin-------"
-    backTester = BackTester('backtest_sma.ini', startTickDate=20001010, startTradeDate=20021010, endTradeDate=20131010)
+    backTester = BackTester('backtest_sma.ini', startTickDate=20050920, startTradeDate=20050920, endTradeDate=20131110)
     backTester.setup()
     backTester.runTests()
     backTester.printMetrics()

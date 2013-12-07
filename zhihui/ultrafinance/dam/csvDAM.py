@@ -4,9 +4,12 @@ import os
 import csv
 from datetime import datetime
 from ultrafinance.dam.baseDAM import BaseDAM
+from ultrafinance.dam.sqlDAM import SqlDAM
 from ultrafinance.model import TICK_FIELDS, QUOTE_FIELDS, Quote, Tick
 from ultrafinance.lib.errors import UfException, Errors
-
+from ultrafinance.ufConfig.pyConfig import PyConfig
+from ultrafinance.dam.DAMFactory import DAMFactory
+import time
 #from os import path
 
 import logging
@@ -95,16 +98,26 @@ class CsvDAM(BaseDAM):
         self.__dir = path
 
 
-def testCSV(path):
+def loadCsvToSqlDam(path):
     """
     testCSV
     """
     print path
-
+    dam = SqlDAM()
+    dam.setup({'db': "sqlite:///../../data/ftest.sqlite"})
+    dam.setSymbol('AGP.L')
     with open(path, "rb") as csvfile:
         _csvReader = csv.reader(csvfile)
+        quotes = []
         for row in _csvReader:
-            print row
-
+            newrow = []
+            for col in row:
+                newrow.append(col)
+            newrow[0] = time.strftime('%Y%m%d', time.strptime(newrow[0], '%Y.%m.%d'))
+            quote = Quote(newrow[0], newrow[2], newrow[3], newrow[4], newrow[5], newrow[6], newrow[5])
+            quotes.append(quote)
+        dam.writeQuotes(quotes)
+        dam.commit()
+        #     print  quote
 if __name__ == "__main__":
-    testCSV("../../data/EURUSD20130101-20131112.csv")
+    loadCsvToSqlDam("../../data/EURUSD20130101-20131112.csv")
