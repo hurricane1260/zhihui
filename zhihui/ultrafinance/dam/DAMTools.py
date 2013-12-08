@@ -14,7 +14,7 @@ def loadCsvToSqlDam(path):
     print path
     dam = SqlDAM()
     dam.setup({'db': "sqlite:///../../data/ftest.sqlite"})
-    dam.setSymbol('AGP.L')
+    dam.setSymbol('EURUSD')
     with open(path, "rb") as csvfile:
         _csvReader = csv.reader(csvfile)
         quotes = []
@@ -73,4 +73,4 @@ def loadMt4CsvToSqlDam(path):
         # dam.commit()
 
 # if __name__ == "__main__":
-#     loadMt4CsvToSqlDam("../../data/eurusd.txt")
+#     loadCsvToSqlDam("../../data/eurusd.csv")
