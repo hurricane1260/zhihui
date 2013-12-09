@@ -114,6 +114,7 @@ class SqlDAM(BaseDAM):
         print setting
 
         self.engine = create_engine(setting['db'], echo = self.echo)
+        print self.engine
 
     def getReadSession(self):
         ''' return scopted session '''
@@ -167,7 +168,7 @@ class SqlDAM(BaseDAM):
                                                             QuoteSql.time >= int(start),
                                                             QuoteSql.time < int(end)))
         finally:
-            self.getReadSession.remove()
+            self.getReadSession().remove()
 
         return [self.__sqlToQuote(row) for row in rows]
 

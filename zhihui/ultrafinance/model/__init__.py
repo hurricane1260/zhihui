@@ -88,6 +88,13 @@ class Quote(object):
         d = json.loads(string)
         return Quote(d['time'], d['open'], d['high'],
                      d['low'], d['close'], d['volume'], d['adjClose'])
+    @staticmethod
+    def toDict():
+        """
+            covert to dict
+            TODO:
+        """
+        return dict()
 
 #Tick = namedtuple('Tick', ' '.join(TICK_FIELDS))
 TupleQuote = namedtuple('Quote', ' '.join(QUOTE_FIELDS))
