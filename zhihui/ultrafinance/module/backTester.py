@@ -239,13 +239,11 @@ class TestRunner(object):
         LOG.info("Running backtest for %s" % self.__symbols)
 
         #start trading engine
-        # 此处开启数据接收线程，接收到K线数据，计算交易策略，计算完后等待下一次更新
         thread = Thread(target=self.__tradingEngine.runListener, args=())
         thread.setDaemon(False)
         thread.start()
 
         #start tickFeeder
-        # 此处循环更新k线数据，待定接收者处理完成后，继续更新一下一个数据
         self.__tickFeeder.execute()
         self.__tickFeeder.complete()
 
