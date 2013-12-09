@@ -20,6 +20,7 @@ class QuotesHandler(tornado.web.RequestHandler):
 
         print os.path.dirname(__file__)
 
+
         dam.setup({'db': 'sqlite:///../zhihui/data/ftest.sqlite'})
         dam.setSymbol('EURUSD')
         _quotes = dam.readQuotes(20000101, 20131231)
