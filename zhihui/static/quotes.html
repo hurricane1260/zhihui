@@ -4,50 +4,68 @@
     <!-- Bootstrap -->
     <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <title></title>
-
     <!-- jQuery -->
-<script src="/static/js/jquery-1.7.2.min.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="/static/js/bootstrap.min.js"></script>
-<!-- HighStock -->
-<script src="/static/js/highstock.js"></script>
-
-    <script type="text/javascript">
-          $(function() {
-
-	$.getJSON('http://127.0.0.1:8080/quotes', function(data) {
-		// Create the chart
-		$('#container').highcharts('StockChart', {
+    <script src="/static/js/jquery-1.7.2.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/static/js/bootstrap.min.js"></script>
+    <!-- HighStock -->
+    <script src="/static/js/highstock.js"></script>
 
 
-			rangeSelector : {
-				selected : 1
-			},
-
-			title : {
-				text : 'AAPL Stock Price'
-			},
-
-			series : [{
-				name : 'AAPL',
-				data : data,
-				tooltip: {
-					valueDecimals: 2
-				}
-			}]
-		});
-	});
-
-});
-   </script>
 </head>
 <body>
 <div class="box-content">
 
-<div id="container" style="height: 500px; min-width: 500px"></div>
+     <script type="text/javascript">
+        $(function () {
+            $.getJSON('http://127.0.0.1:8080/quotes', function (data) {
+                // Create the chart
+                var chartdata=[]
+                function filldata(){
+                    for(var i=0; i<data.length; i++){
+
+                        var dateStr = data[i].time.toString()
+                        var year = dateStr.slice(0,4)
+                        var month = dateStr.slice(4,6)
+                        var day = dateStr.slice(6,8)
+
+                        var temp = [
+                            Date.UTC(year,month,day),
+                            data[i].open,
+                            data[i].high,
+                            data[i].low,
+                            data[i].close]
+
+                        chartdata.push(temp)
+
+                    }
+                }
+
+                filldata()
+                //console.log(chartdata)
+                $('#container').highcharts('StockChart', {
+                    rangeSelector: {
+                        selected: 1
+                    },
+
+                    title: {
+                        text: 'EURUSD Price'
+                    },
+
+                    series: [
+                        {
+                            name: 'EURUSD',
+                            type: 'candlestick',
+                            data: chartdata
+                        }
+                    ]
+                });
+            });
+        });
+    </script>
+    <div id="container" style="height: 500px; min-width: 500px"></div>
 
 </div>
-
 
 
 </body>

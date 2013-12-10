@@ -24,7 +24,7 @@ class QuotesHandler(tornado.web.RequestHandler):
         dam.setup({'db': 'sqlite:///../zhihui/data/ftest.sqlite'})
         dam.setSymbol('EURUSD')
         _quotes = dam.readQuotes(20000101, 20131231)
-        quotes = [str(quote) for quote in _quotes]
+        quotes = [quote.toDict() for quote in _quotes]
         self.write(json.dumps(quotes))
 
 if __name__ == "__main__":
