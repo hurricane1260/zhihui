@@ -21,12 +21,18 @@
             $.getJSON('http://127.0.0.1:8080/quotes', function (data) {
                 // Create the chart
                 var chartdata = []
+                var flagslinedata =  []
                 var flagsdataBuyOpen = []
                 var flagsdataBuyClose = []
                 var flagsdataSellOpen = []
                 var flagsdataSellClose = []
 
                 function filldata(){
+
+                    var openPrice = 0;
+                    var openTickCount = 0;
+                    var tempDates = []
+                    var skipline = false
                     for(var i=0; i<data.length; i++){
 
                         var dateStr = data[i].time.toString()
@@ -44,14 +50,19 @@
                         var order = data[i].order
 
                         if(order == 1){
+                            openTickCount++
+                            openPrice = data[i].low
+                            tempDates.push(Date.UTC(year, month, day))
                             var flag ={
                             x : Date.UTC(year, month, day),
-                            y : data[i].high,
+                            y : data[i].low,
                             title : 'BO',
                             text : 'buy order open'
                             }
                             flagsdataBuyOpen.push(flag)
                         }else if(order == 2){
+                            openTickCount++
+                            tempDates.push(Date.UTC(year, month, day))
                             var flag ={
                             x : Date.UTC(year, month, day),
                             y : data[i].high,
@@ -59,7 +70,27 @@
                             text : 'buy order close'
                             }
                             flagsdataBuyClose.push(flag)
+                            var price = openPrice;
+                            var nowprice = data[i].high
+                            for(var j = 0; j< openTickCount;j++){
+                                price = openPrice + (nowprice - openPrice)*j/(openTickCount-1)
+                                var templine = [
+                                    tempDates[j],
+                                    price,
+                                    price,
+                                    price,
+                                    price]
+                                flagslinedata.push(templine)
+                            }
+                            openTickCount = 0;
+                            openPrice = 0;
+                            skipline = true
+                            tempDates = []
                         }else if(order == 3){
+                            openTickCount++
+                            openPrice = data[i].high
+                            tempDates.push(Date.UTC(year, month, day))
+
                             var flag ={
                             x : Date.UTC(year, month, day),
                             y : data[i].high,
@@ -68,15 +99,43 @@
                             }
                             flagsdataSellOpen.push(flag)
                         }else if(order == 4){
+                            openTickCount++
+                            tempDates.push(Date.UTC(year, month, day))
                             var flag ={
                             x : Date.UTC(year, month, day),
-                            y : data[i].high,
+                            y : data[i].low,
                             title : 'SC',
                             text : 'sell order close'
                             }
                             flagsdataSellClose.push(flag)
+                            var price = openPrice;
+                            var nowprice = data[i].low
+                            for(var j = 0; j < openTickCount;j++){
+                                price = openPrice + (nowprice - openPrice)*j/(openTickCount-1)
+                                var templine = [
+                                    tempDates[j],
+                                    price,
+                                    price,
+                                    price,
+                                    price]
+                                flagslinedata.push(templine)
+                            }
+                            openTickCount = 0
+                            openPrice = 0;
+                            skipline = true
+                            tempDates = []
                         }
-
+                        if(openTickCount == 0 && !skipline){
+                            var price = null
+                            var temp2 = [
+                                    Date.UTC(year, month, day),
+                                    price,
+                                    price,
+                                    price,
+                                    price]
+                            flagslinedata.push(temp2)
+                        }
+                        skipline = false
                         chartdata.push(temp)
 
                     }
@@ -98,6 +157,13 @@
                             name: 'EURUSD',
                             type: 'candlestick',
                             data: chartdata
+                        },
+                        {
+                            name : 'Result',
+                            data : flagslinedata,
+                            tooltip: {
+                                valueDecimals: 2
+                            }
                         },
                         {
                             type : 'flags',
