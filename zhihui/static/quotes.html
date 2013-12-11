@@ -20,7 +20,12 @@
         $(function () {
             $.getJSON('http://127.0.0.1:8080/quotes', function (data) {
                 // Create the chart
-                var chartdata=[]
+                var chartdata = []
+                var flagsdataBuyOpen = []
+                var flagsdataBuyClose = []
+                var flagsdataSellOpen = []
+                var flagsdataSellClose = []
+
                 function filldata(){
                     for(var i=0; i<data.length; i++){
 
@@ -35,6 +40,42 @@
                             data[i].high,
                             data[i].low,
                             data[i].close]
+
+                        var order = data[i].order
+
+                        if(order == 1){
+                            var flag ={
+                            x : Date.UTC(year, month, day),
+                            y : data[i].high,
+                            title : 'BO',
+                            text : 'buy order open'
+                            }
+                            flagsdataBuyOpen.push(flag)
+                        }else if(order == 2){
+                            var flag ={
+                            x : Date.UTC(year, month, day),
+                            y : data[i].high,
+                            title : 'BC',
+                            text : 'buy order close'
+                            }
+                            flagsdataBuyClose.push(flag)
+                        }else if(order == 3){
+                            var flag ={
+                            x : Date.UTC(year, month, day),
+                            y : data[i].high,
+                            title : 'SO',
+                            text : 'sell order open'
+                            }
+                            flagsdataSellOpen.push(flag)
+                        }else if(order == 4){
+                            var flag ={
+                            x : Date.UTC(year, month, day),
+                            y : data[i].high,
+                            title : 'SC',
+                            text : 'sell order close'
+                            }
+                            flagsdataSellClose.push(flag)
+                        }
 
                         chartdata.push(temp)
 
@@ -57,7 +98,56 @@
                             name: 'EURUSD',
                             type: 'candlestick',
                             data: chartdata
+                        },
+                        {
+                            type : 'flags',
+                            data : flagsdataBuyOpen,
+                            onSeries : 'dataseries',
+                            shape : 'circlepin',
+                            color : '#5F86B3',
+				            fillColor : '#00ff00',
+				            style : {// text style
+					            color : 'white'
+				            },
+                            width : 16
+                        },
+                        {
+                            type : 'flags',
+                            data : flagsdataBuyClose,
+                            onSeries : 'dataseries',
+                            shape : 'squarepin',
+                            color : '#5F86B3',
+				            fillColor : '#00ff00',
+				            style : {// text style
+					            color : 'white'
+				            },
+                            width : 16
+                        },
+                        {
+                            type : 'flags',
+                            data : flagsdataSellOpen,
+                            onSeries : 'dataseries',
+                            shape : 'circlepin',
+                            color : '#5F86B3',
+				            fillColor : '#ff0000',
+				            style : {// text style
+					            color : 'white'
+				            },
+                            width : 16
+                        },
+                        {
+                            type : 'flags',
+                            data : flagsdataSellClose,
+                            onSeries : 'dataseries',
+                            shape : 'squarepin',
+                            color : '#5F86B3',
+				            fillColor : '#ff0000',
+				            style : {// text style
+					            color : 'white'
+				            },
+                            width : 16
                         }
+
                     ]
                 });
             });
