@@ -20,7 +20,7 @@ class TradingEngine(object):
         if it exceeds, them unregister that subscriber
     '''
     def __init__(self, threadTimeout = 2, threadMaxFail = 10):
-        self.__subs = {} # {'event': {sub: {symbols: sub} }
+        self.__subs = {} # {'event': {sub: {symbols: ['symbol1','symbol2'],fail: 0} }
         self.tickProxy = None
         self.orderProxy = None
         self.saver = None
@@ -167,7 +167,7 @@ class TradingEngine(object):
         if event not in self.__subs:
             LOG.warn("EVENT_TICK_UPDATE not in self.__subs %s" % self.__subs)
             return
-
+        #_subs format# {'event': {sub: {symbols: ['symbol1','symbol2'],fail: 0} }
         for sub, attrs in self.__subs[event].items():
             ticks = {}
             for symbol in attrs['symbols']:
