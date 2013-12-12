@@ -6,6 +6,8 @@ from sqlalchemy import and_
 from zhihui.web.extention.routing import route
 from ultrafinance.dam.sqlDAM import SqlDAM, QuoteSql
 from ultrafinance.backTest.stateSaver.sqlSaver import  SqlSaver
+from zhihui.tools.trainDataMaker import findUpFlag
+from zhihui.tools.trainDataMaker import findDownFlag
 
 @route(r"/quotes", name="quotes")
 class QuotesHandler(tornado.web.RequestHandler):
@@ -40,12 +42,13 @@ class QuotesHandler(tornado.web.RequestHandler):
         quotes = []
         # [quote.toDict() for quote in _quotes]
 
-        for quote in _quotes:
+        for i in range(0,len(_quotes)):
+            quote = _quotes[i]
             quoterow = quote.toDict()
             type = 0
-            if(quote.time in flags):
+            if quote.time in flags:
                 action = flags[quote.time]
-                if  self.BUY == action :
+                if self.BUY == action:
                     type = 1
                 elif self.SELL == action:
                     type = 2
@@ -55,7 +58,15 @@ class QuotesHandler(tornado.web.RequestHandler):
                     type = 4
 
             quoterow['order'] = type
-
+            if i > 9:
+                if findUpFlag(i, _quotes):
+                    quoterow['fractal'] = 1
+                elif findDownFlag(i, _quotes):
+                    quoterow['fractal'] = 2
+                else:
+                    quoterow['fractal'] = 0
+            else:
+                quoterow['fractal'] = 0
             quotes.append(quoterow)
         self.write(json.dumps(quotes))
 

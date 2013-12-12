@@ -26,6 +26,7 @@
                 var flagsdataBuyClose = []
                 var flagsdataSellOpen = []
                 var flagsdataSellClose = []
+                var fractalData = []
 
                 function filldata(){
 
@@ -48,6 +49,24 @@
                             data[i].close]
 
                         var order = data[i].order
+                        var fractal = data[i].fractal
+                        if(fractal == 1){
+                            var fractflag ={
+                            x : Date.UTC(year, month, day),
+                            y : data[i].high,
+                            title : 'dn',
+                            text : 'fractal down'
+                            }
+                            fractalData.push(fractflag)
+                        }else if(fractal == 2){
+                            var fractflag ={
+                            x : Date.UTC(year, month, day),
+                            y : data[i].low,
+                            title : 'up',
+                            text : 'fractal up'
+                            }
+                            fractalData.push(fractflag)
+                        }
 
                         if(order == 1){
                             openTickCount++
@@ -208,6 +227,18 @@
                             shape : 'squarepin',
                             color : '#5F86B3',
 				            fillColor : '#ff0000',
+				            style : {// text style
+					            color : 'white'
+				            },
+                            width : 16
+                        },
+                        {
+                            type : 'flags',
+                            data : fractalData,
+                            onSeries : 'dataseries',
+                            shape : 'squarepin',
+                            color : '#5F86B3',
+				            fillColor : '#0000ff',
 				            style : {// text style
 					            color : 'white'
 				            },
