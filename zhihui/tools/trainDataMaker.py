@@ -15,7 +15,7 @@ def buildTrainData():
         time = quoterow['time']
         if i > 9:
             if findUpFlag(i,_quotes):
-                print 'find up: ',time
+                print 'find up: ', time
             if findDownFlag(i,_quotes):
                 print 'fine down: ',time
     print len(_quotes)
@@ -61,30 +61,29 @@ def findUpFlag(i,quotes):
 def findDownFlag(i,quotes):
     bFound=False
     dCurrent=Low(i,quotes)
-    Bars = len(quotes)
     type = -1
     if dCurrent<Low(i+1*type,quotes) and dCurrent<Low(i+2*type,quotes) and dCurrent < Low(i-1*type,quotes) and dCurrent<Low(i-2*type,quotes):
         bFound=True
     # //----6 bars Fractal
     if not bFound:
         if dCurrent==Low(i+1*type,quotes) and dCurrent<Low(i+2*type,quotes) and dCurrent<Low(i+3*type,quotes) and \
-            dCurrent<Low(i-1*type,quotes) and dCurrent<Low(i-1*type,quotes):
+            dCurrent<Low(i-1*type,quotes) and dCurrent<Low(i-2*type,quotes):
             bFound=True
     # //----7 bars Fractal
     if not bFound:
         if dCurrent<=Low(i+1*type,quotes) and dCurrent==Low(i+2*type,quotes) and dCurrent<Low(i+3*type,quotes) and dCurrent<Low(i+4*type,quotes) and \
-            dCurrent<Low(i-1*type,quotes) and dCurrent<Low(i-1*type,quotes):
+            dCurrent<Low(i-1*type,quotes) and dCurrent<Low(i-2*type,quotes):
             bFound=True
 
     # //----8 bars Fractal
     if not bFound:
         if dCurrent<=Low(i+1*type,quotes) and dCurrent==Low(i+2*type,quotes) and dCurrent==Low(i+3*type,quotes) and dCurrent<Low(i+4*type,quotes) and \
-            dCurrent<Low(i+5*type,quotes) and dCurrent<Low(i-1*type,quotes) and dCurrent<Low(i-1*type,quotes):
+            dCurrent<Low(i+5*type,quotes) and dCurrent<Low(i-1*type,quotes) and dCurrent<Low(i-2*type,quotes):
             bFound=True
     # //----8 bars Fractal
     if not bFound:
         if dCurrent<=Low(i+1*type,quotes) and dCurrent==Low(i+2*type,quotes) and dCurrent==Low(i+3*type,quotes) and dCurrent==Low(i+4*type,quotes) and \
-            dCurrent<Low(i+5*type,quotes) and dCurrent<Low(i+6*type,quotes) and dCurrent<Low(i-1*type,quotes) and dCurrent<Low(i-1*type,quotes):
+            dCurrent<Low(i+5*type,quotes) and dCurrent<Low(i+6*type,quotes) and dCurrent<Low(i-1*type,quotes) and dCurrent<Low(i-2*type,quotes):
             bFound=True
 
     return bFound
