@@ -7,7 +7,7 @@ from zhihui.web.extention.routing import route
 from ultrafinance.dam.sqlDAM import SqlDAM, QuoteSql
 from ultrafinance.backTest.stateSaver.sqlSaver import  SqlSaver
 from zhihui.tools.trainDataMaker import getFilteredFractalRow
-from zhihui.tools.trainDataMaker import getFractalsData
+from zhihui.tools.trainDataMaker import getFractalsList
 from zhihui.tools.trainDataMaker import getTimeKeyFractals
 
 @route(r"/quotes", name="quotes")
@@ -44,7 +44,7 @@ class QuotesHandler(tornado.web.RequestHandler):
         # [quote.toDict() for quote in _quotes]
 
         timekeyfractals = getTimeKeyFractals()
-        fractalsData = getFractalsData()
+        fractalsData = getFractalsList()
         for i in range(0,len(_quotes)):
             quote = _quotes[i]
             quoterow = quote.toDict()
