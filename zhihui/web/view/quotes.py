@@ -6,8 +6,9 @@ from sqlalchemy import and_
 from zhihui.web.extention.routing import route
 from ultrafinance.dam.sqlDAM import SqlDAM, QuoteSql
 from ultrafinance.backTest.stateSaver.sqlSaver import  SqlSaver
-from zhihui.tools.trainDataMaker import findUpFlag
-from zhihui.tools.trainDataMaker import findDownFlag
+from zhihui.tools.trainDataMaker import getFilteredFractalRow
+from zhihui.tools.trainDataMaker import getFractalsData
+from zhihui.tools.trainDataMaker import getTimeKeyFractals
 
 @route(r"/quotes", name="quotes")
 class QuotesHandler(tornado.web.RequestHandler):
@@ -42,6 +43,8 @@ class QuotesHandler(tornado.web.RequestHandler):
         quotes = []
         # [quote.toDict() for quote in _quotes]
 
+        timekeyfractals = getTimeKeyFractals()
+        fractalsData = getFractalsData()
         for i in range(0,len(_quotes)):
             quote = _quotes[i]
             quoterow = quote.toDict()
@@ -58,15 +61,30 @@ class QuotesHandler(tornado.web.RequestHandler):
                     type = 4
 
             quoterow['order'] = type
+            quoterow['fractal'] = 0
+            # if i > 9:
+            #     if findUpFlag(i, _quotes):
+            #         quoterow['fractal'] = 1
+            #     elif findDownFlag(i, _quotes):
+            #         quoterow['fractal'] = 2
+            #     else:
+            #         quoterow['fractal'] = 0
+            # else:
+            #     quoterow['fractal'] = 0
+
             if i > 9:
-                if findUpFlag(i, _quotes):
-                    quoterow['fractal'] = 1
-                elif findDownFlag(i, _quotes):
-                    quoterow['fractal'] = 2
-                else:
-                    quoterow['fractal'] = 0
-            else:
-                quoterow['fractal'] = 0
+                if quote.time in timekeyfractals:
+                    type = timekeyfractals[quote.time]['type']
+                    index = timekeyfractals[quote.time]['findex']
+                    row = getFilteredFractalRow(index, fractalsData)
+                    use = row[0]
+                    if type == 1 and use == 1:
+                        type = 11
+                    elif type == 2 and use == 1:
+                        type = 21
+                    print type,' ',use
+                    quoterow['fractal'] = type
+
             quotes.append(quoterow)
         self.write(json.dumps(quotes))
 
