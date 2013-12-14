@@ -25,6 +25,11 @@ F_TYPE = {
     2: 'U'
 }
 
+COLOR_TYPE ={
+    0: '#0000ff',
+    1: '#ff0000'
+}
+
 @route(r"/quotes", name="quotes")
 class QuotesHandler(tornado.web.RequestHandler):
     """
@@ -77,7 +82,7 @@ class QuotesHandler(tornado.web.RequestHandler):
                         type = 11
                     elif type == 2 and use == 1:
                         type = 21
-                    print type,' ',use
+                    #print type,' ',use
                     quoterow['fractal'] = type
 
             quotes.append(quoterow)
@@ -102,6 +107,10 @@ class Indicators(tornado.web.RequestHandler):
             retRow['y'] = row['quote']['close']
             retRow['title'] = F_TYPE.get(row['type'])
             retRow['text'] = "fractals " + retRow['title']
+            row = getFilteredFractalRow(row['findex'], fractalsData)
+            color_type = COLOR_TYPE[row[0]]
+            retRow['fillColor'] = color_type
+
             retData.append(retRow)
         self.write(json.dumps(retData))
 
