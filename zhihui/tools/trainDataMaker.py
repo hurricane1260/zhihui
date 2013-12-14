@@ -12,18 +12,16 @@ import pandas as pd
 from sklearn import datasets
 
 def svmtest():
-    clf = svm.SVC(kernel='rbf')
+    clf = svm.SVC(kernel='linear')
     fractalsList = getFractalsList()
     fractalsFiltered, target = getFilteredFractalsList(fractalsList)
-    clf.fit(fractalsFiltered,target)
-    print fractalsFiltered
-    print target
-    data = [[8, 0.02848000000000006]]
-    print clf.predict(data)
-    # print fractalsFiltered
-    # iris = datasets.load_iris()
-    # print len(iris.data)
-    # print len(iris.target)
+    nft = np.array(fractalsFiltered)
+    ntarget = np.array(target)
+    clf.fit(nft, ntarget)
+    print nft
+    print ntarget
+    print clf.predict(nft)
+
 
 def getSourceData():
     dam = SqlDAM()
@@ -55,19 +53,58 @@ def getFractalsList():
         # print quoterow
     return fractals
 
+def findPreFarDiffIndex(index, fractals, type):
+    price = fractals[index]['quote']['close']
+    pricediff = 0
+    targetindex = index -1
+    hasfoundone = False
+    for i in range(1, index):
+        tindex = index - i
+        if fractals[tindex]['type'] != type:
+            newpricediff = abs(fractals[tindex]['quote']['close'] - price)
+            if newpricediff > pricediff:
+                pricediff = newpricediff
+                targetindex = tindex
+                hasfoundone = True
+        elif hasfoundone:
+            break
+
+    return targetindex
+
+def findNextFarDiffIndex(index, fractals, type):
+    price = fractals[index]['quote']['close']
+    pricediff = 0
+    targetindex = index + 1
+    hasfoundone = False
+    for i in range(index, len(fractals)):
+        tindex = i
+        if fractals[tindex]['type'] != type:
+            newpricediff = abs(fractals[tindex]['quote']['close'] - price)
+            if newpricediff > pricediff:
+                pricediff = newpricediff
+                targetindex = tindex
+                hasfoundone = True
+        elif hasfoundone:
+            break
+
+    return targetindex
+
 def getFilteredFractalRow(index, fractals):
     if not index in range(1, len(fractals) -1):
         return [0,0,0,0]
     i = index
     ft = fractals[i]
+    type = ft['type']
     curindex = ft['index']
     curprice = ft['quote']['close']
-    x1 = curindex - fractals[i-1]['index']
-    x2 = fractals[i+1]['index'] - curindex
-    y1 = curprice - fractals[i-1]['quote']['close']
-    y2 = fractals[i+1]['quote']['close'] - curprice
-    type = ft['type']
-    if x1 >= 3 and x2 >= 3 and abs(y1) > 0.014 and abs(y2) > 0.014:
+
+    preIndex = findPreFarDiffIndex(i, fractals, type)
+    nextIndex = findNextFarDiffIndex(i, fractals, type)
+    x1 = curindex - fractals[preIndex]['index']
+    x2 = fractals[nextIndex]['index'] - curindex
+    y1 = curprice - fractals[preIndex]['quote']['close']
+    y2 = fractals[nextIndex]['quote']['close'] - curprice
+    if x1 >= 2 and x2 >= 2 and abs(y1) > 0.015 and abs(y2) > 0.015:
         result = [1, x1, y1, type]
     else:
         result = [0, x1, y1, type]
@@ -84,12 +121,13 @@ def getFilteredFractalsList(fractalsList):
     target = []
     for i in range(1, len(fractals)-1):
         result =getFilteredFractalRow(i, fractals)
-        data = [result[1], abs(result[2])]
-        target.append(result[0])
+        data = [result[1], (int)(abs(result[2])*10000)]
         fractalsFliteredResult.append(data)
-        # val ='-1'
-        # if result[0] == 1:
-        #     val ='+1'
+        val = 0
+        if result[0] == 1:
+            val =1
+        target.append(val)
+
         # val1 =str.format('1:%d'%result[1])
         # val2 = str.format('2:%f'%abs(result[2]))
         # print val,val1,val2
