@@ -5,13 +5,12 @@ import tornado.web
 
 from datetime import datetime
 import time
-
-from sqlalchemy import and_
 from zhihui.web.extention.routing import route
-from ultrafinance.dam.sqlDAM import SqlDAM, QuoteSql
+from ultrafinance.dam.sqlDAM import SqlDAM
 from ultrafinance.backTest.stateSaver.sqlSaver import SqlSaver
 from zhihui.tools.trainDataMaker import getSourceData
-from zhihui.ultrafinance.pyTaLib.fractal import Fractal, FractalSelectManager
+from zhihui.ultrafinance.pyTaLib.fractal import Fractal
+from zhihui.tools.trainDataMaker import FractalSelectManager
 
 
 ORDER_ACTION = {'sell': 1,
