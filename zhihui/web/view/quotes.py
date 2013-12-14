@@ -8,7 +8,6 @@ import time
 from zhihui.web.extention.routing import route
 from ultrafinance.dam.sqlDAM import SqlDAM
 from ultrafinance.backTest.stateSaver.sqlSaver import SqlSaver
-from zhihui.tools.trainDataMaker import getSourceData
 from zhihui.ultrafinance.pyTaLib.fractal import Fractal
 from zhihui.tools.trainDataMaker import FractalSelectManager
 
@@ -27,6 +26,13 @@ COLOR_TYPE ={
     0: '#0000ff',
     1: '#ff0000'
 }
+
+def getSourceData():
+    dam = SqlDAM()
+    dam.setup({'db': 'sqlite:///../zhihui/data/ftest.sqlite'})
+    dam.setSymbol('EURUSD')
+    _quotes = dam.readQuotes(20000101, 20131231)
+    return _quotes
 
 @route(r"/quotes", name="quotes")
 class QuotesHandler(tornado.web.RequestHandler):

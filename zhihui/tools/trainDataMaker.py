@@ -11,6 +11,7 @@ from sklearn import tree
 import pandas as pd
 from sklearn import datasets
 from datetime import datetime
+from ultrafinance.pyTaLib.indicator import Stoch
 import time
 from talib import abstract
 
@@ -39,13 +40,14 @@ def tablibtest():
     'close': tainputs,
     'volume': np.random.random(100)
     }
-
-    print abstract.SMA(myinput)
+    stoch = Stoch(30)
+    for i in range(0,100):
+        print stoch(tainputs[i])
 
 
 def getSourceData():
     dam = SqlDAM()
-    dam.setup({'db': 'sqlite:///../zhihui/data/ftest.sqlite'})
+    dam.setup({'db': 'sqlite:///../../zhihui/data/ftest.sqlite'})
     dam.setSymbol('EURUSD')
     _quotes = dam.readQuotes(20000101, 20131231)
     return _quotes

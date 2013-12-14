@@ -3,11 +3,12 @@ Created on May 26, 2012
 
 @author: ppa
 '''
-import numpy
+import numpy as np
 from numpy import polyval, polyfit
 from math import sqrt
 from collections import deque
 from scipy import stats
+from talib import abstract
 
 def mean(array):
     ''' average '''
@@ -188,3 +189,59 @@ def rsquared(x, y):
 
     _, _, r_value, _, _ = stats.linregress(x, y)
     return r_value**2
+
+class Macd(object):
+
+    def __init__(self, period):
+        assert period == int(period) and period > 0, "Period must be an integer > 0"
+        self.__period = period
+        self.__stream = deque()
+        self.__value = None
+
+    def getLastValue(self):
+        return self.__value
+
+    def __call__(self, n):
+        self.__stream.append(n)
+        if len(self.__stream) > self.__period*2:
+            inputs = np.array(self.__stream)
+            self.__stream.popleft()
+            talibInput = {
+                'open': inputs,
+                'high': inputs,
+                'low': inputs,
+                'close': inputs,
+                'volume': np.random.random(len(inputs))
+            }
+            self.__value = abstract.MACD(talibInput, self.__period)
+            return self.__value
+        else:
+            return None
+
+class Stoch(object):
+
+    def __init__(self, period):
+        assert period == int(period) and period > 0, "Period must be an integer > 0"
+        self.__period = period
+        self.__stream = deque()
+        self.__value = None
+
+    def getLastValue(self):
+        return self.__value
+
+    def __call__(self, n):
+        self.__stream.append(n)
+        if len(self.__stream) > self.__period:
+            inputs = np.array(self.__stream)
+            self.__stream.popleft()
+            talibInput = {
+                'open': inputs,
+                'high': inputs,
+                'low': inputs,
+                'close': inputs,
+                'volume': np.random.random(len(inputs))
+            }
+            self.__value = abstract.STOCH(talibInput, 5, 3, 0, 3, 0)
+            return self.__value
+        else:
+            return None
