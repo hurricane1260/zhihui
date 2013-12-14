@@ -104,8 +104,15 @@ def getFilteredFractalRow(index, fractals):
     x2 = fractals[nextIndex]['index'] - curindex
     y1 = curprice - fractals[preIndex]['quote']['close']
     y2 = fractals[nextIndex]['quote']['close'] - curprice
+    preoneprice = fractals[i - 1]['quote']['close']
+    nextoneprice = fractals[i + 1]['quote']['close']
     if x1 >= 2 and x2 >= 2 and abs(y1) > 0.015 and abs(y2) > 0.015:
-        result = [1, x1, y1, type]
+        if type == 1 and curprice > preoneprice and curprice >= nextoneprice: #down
+            result = [1, x1, y1, type]
+        elif type == 2 and curprice <= preoneprice and curprice <= nextoneprice: #up
+            result = [1, x1, y1, type]
+        else:
+            result = [0, x1, y1, type]
     else:
         result = [0, x1, y1, type]
     # print result
