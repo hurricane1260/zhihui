@@ -17,6 +17,7 @@
      <script type="text/javascript">
         $(function () {
             var fractalData = []
+            var filteredFractalData = []
             $.getJSON('http://127.0.0.1:8080/indicators', function (data) {
 
                 fractalData = data
@@ -54,130 +55,6 @@
                             data[i].low,
                             data[i].close]
 
-//                        var order = data[i].order
-//                        var fractal = data[i].fractal
-//                        if(fractal == 1){
-//                            var fractflag ={
-//                            x : Date.UTC(year, month, day),
-//                            y : data[i].high,
-//                            title : 'dn',
-//                            text : 'fractal down'
-//                            }
-//                            fractalData.push(fractflag)
-//                        }else if(fractal == 11){
-//                            var fractflag ={
-//                            x : Date.UTC(year, month, day),
-//                            y : data[i].high,
-//                            title : 'dn',
-//                            fillColor : '#ff0000',
-//                            text : 'fractal down'
-//                            }
-//                            fractalData.push(fractflag)
-//                        }else if(fractal == 2){
-//                            var fractflag ={
-//                            x : Date.UTC(year, month, day),
-//                            y : data[i].low,
-//                            title : 'up',
-//                            text : 'fractal up'
-//                            }
-//                            fractalData.push(fractflag)
-//                        }else if(fractal == 21){
-//                            var fractflag ={
-//                            x : Date.UTC(year, month, day),
-//                            y : data[i].low,
-//                            title : 'up',
-//                            fillColor : '#ff0000',
-//                            text : 'fractal up'
-//                            }
-//                            fractalData.push(fractflag)
-//                        }
-
-//                        if(order == 1){
-//                            openTickCount++
-//                            openPrice = data[i].low
-//                            tempDates.push(Date.UTC(year, month, day))
-//                            var flag ={
-//                            x : Date.UTC(year, month, day),
-//                            y : data[i].low,
-//                            title : 'BO',
-//                            text : 'buy order open'
-//                            }
-//                            flagsdataBuyOpen.push(flag)
-//                        }else if(order == 2){
-//                            openTickCount++
-//                            tempDates.push(Date.UTC(year, month, day))
-//                            var flag ={
-//                            x : Date.UTC(year, month, day),
-//                            y : data[i].high,
-//                            title : 'BC',
-//                            text : 'buy order close'
-//                            }
-//                            flagsdataBuyClose.push(flag)
-//                            var price = openPrice;
-//                            var nowprice = data[i].high
-//                            for(var j = 0; j< openTickCount;j++){
-//                                price = openPrice + (nowprice - openPrice)*j/(openTickCount-1)
-//                                var templine = [
-//                                    tempDates[j],
-//                                    price,
-//                                    price,
-//                                    price,
-//                                    price]
-//                                flagslinedata.push(templine)
-//                            }
-//                            openTickCount = 0;
-//                            openPrice = 0;
-//                            skipline = true
-//                            tempDates = []
-//                        }else if(order == 3){
-//                            openTickCount++
-//                            openPrice = data[i].high
-//                            tempDates.push(Date.UTC(year, month, day))
-//
-//                            var flag ={
-//                            x : Date.UTC(year, month, day),
-//                            y : data[i].high,
-//                            title : 'SO',
-//                            text : 'sell order open'
-//                            }
-//                            flagsdataSellOpen.push(flag)
-//                        }else if(order == 4){
-//                            openTickCount++
-//                            tempDates.push(Date.UTC(year, month, day))
-//                            var flag ={
-//                            x : Date.UTC(year, month, day),
-//                            y : data[i].low,
-//                            title : 'SC',
-//                            text : 'sell order close'
-//                            }
-//                            flagsdataSellClose.push(flag)
-//                            var price = openPrice;
-//                            var nowprice = data[i].low
-//                            for(var j = 0; j < openTickCount;j++){
-//                                price = openPrice + (nowprice - openPrice)*j/(openTickCount-1)
-//                                var templine = [
-//                                    tempDates[j],
-//                                    price,
-//                                    price,
-//                                    price,
-//                                    price]
-//                                flagslinedata.push(templine)
-//                            }
-//                            openTickCount = 0
-//                            openPrice = 0;
-//                            skipline = true
-//                            tempDates = []
-//                        }
-//                        if(openTickCount == 0 && !skipline){
-//                            var price = null
-//                            var temp2 = [
-//                                    Date.UTC(year, month, day),
-//                                    price,
-//                                    price,
-//                                    price,
-//                                    price]
-//                            flagslinedata.push(temp2)
-//                        }
                         skipline = false
                         chartdata.push(temp)
 
@@ -195,7 +72,6 @@
                     title: {
                         text: 'EURUSD Price'
                     },
-
                     series: [
                         {
                             name: 'EURUSD',
@@ -267,6 +143,15 @@
 				            style : {// text style
 					            color : 'white'
 				            },
+                            point:{
+                                events: {
+                                    click:function(event){
+                                        filteredFractalData.push(this.x)
+                                        console.log(filteredFractalData)
+                                        alert(filteredFractalData)
+                                    }
+                                }
+                            },
                             width : 16
                         }
 
