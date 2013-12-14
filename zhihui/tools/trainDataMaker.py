@@ -3,6 +3,27 @@ __author__ = 'billzhou'
 
 from zhihui.web.extention.routing import route
 from ultrafinance.dam.sqlDAM import SqlDAM, QuoteSql
+import numpy as np
+import pylab as pl
+from sklearn import svm
+from sklearn import linear_model
+from sklearn import tree
+import pandas as pd
+from sklearn import datasets
+
+def svmtest():
+    clf = svm.SVC(kernel='rbf')
+    fractalsList = getFractalsList()
+    fractalsFiltered, target = getFilteredFractalsList(fractalsList)
+    clf.fit(fractalsFiltered,target)
+    print fractalsFiltered
+    print target
+    data = [[8, 0.02848000000000006]]
+    print clf.predict(data)
+    # print fractalsFiltered
+    # iris = datasets.load_iris()
+    # print len(iris.data)
+    # print len(iris.target)
 
 def getSourceData():
     dam = SqlDAM()
@@ -50,7 +71,7 @@ def getFilteredFractalRow(index, fractals):
         result = [1, x1, y1, type]
     else:
         result = [0, x1, y1, type]
-    print result
+    # print result
     return result
 
     # fromat:
@@ -60,16 +81,22 @@ def getFilteredFractalsList(fractalsList):
 
     fractals = fractalsList
     fractalsFliteredResult = []
-
+    target = []
     for i in range(1, len(fractals)-1):
         result =getFilteredFractalRow(i, fractals)
-
-        fractalsFliteredResult.append(result)
-        print result
+        data = [result[1], abs(result[2])]
+        target.append(result[0])
+        fractalsFliteredResult.append(data)
+        # val ='-1'
+        # if result[0] == 1:
+        #     val ='+1'
+        # val1 =str.format('1:%d'%result[1])
+        # val2 = str.format('2:%f'%abs(result[2]))
+        # print val,val1,val2
 
 
     # print '\nfractal: ', len(fractals), 'result: ', len(fractalsResult)
-    return fractalsFliteredResult
+    return fractalsFliteredResult, target
 
 def getTimeKeyFractals():
     fractals = getFractalsList()
@@ -83,10 +110,10 @@ def buildTrainData():
     getTimeKeyFractals()
 
 def High(i, quotes):
-    return quotes[i].toDict()['high']
+    return quotes[i].toDict()['close']
 
 def Low(i,quotes):
-    return quotes[i].toDict()['low']
+    return quotes[i].toDict()['close']
 
 
 def findUpFlag(i,quotes):
@@ -151,4 +178,5 @@ def findDownFlag(i,quotes):
     return bFound
 
 if __name__ == "__main__":
-    buildTrainData()
+    # buildTrainData()
+    svmtest()
