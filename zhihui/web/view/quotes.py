@@ -9,6 +9,12 @@ from ultrafinance.backTest.stateSaver.sqlSaver import  SqlSaver
 from zhihui.tools.trainDataMaker import findUpFlag
 from zhihui.tools.trainDataMaker import findDownFlag
 
+
+ORDER_ACTION = {'sell': 1,
+                'buy': 2,
+                'sell_short': 3,
+                'buy_to_cover': 4}
+
 @route(r"/quotes", name="quotes")
 class QuotesHandler(tornado.web.RequestHandler):
     """
@@ -48,14 +54,7 @@ class QuotesHandler(tornado.web.RequestHandler):
             type = 0
             if quote.time in flags:
                 action = flags[quote.time]
-                if self.BUY == action:
-                    type = 1
-                elif self.SELL == action:
-                    type = 2
-                elif self.SELL_SHORT == action:
-                    type = 3
-                elif self.BUY_TO_COVER == action:
-                    type = 4
+                type = ORDER_ACTION.get(action, 0)
 
             quoterow['order'] = type
             if i > 9:
