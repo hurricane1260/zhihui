@@ -16,10 +16,10 @@ def svmtest():
     fractalsList = getFractalsList()
     fractalsFiltered, target = getFilteredFractalsList(fractalsList)
     clf.fit(fractalsFiltered,target)
-    print fractalsFiltered
-    print target
+    # print fractalsFiltered
+    # print target
     data = [[8, 0.02848000000000006]]
-    print clf.predict(data)
+    # print clf.predict(data)
     # print fractalsFiltered
     # iris = datasets.load_iris()
     # print len(iris.data)
