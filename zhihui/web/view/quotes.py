@@ -2,6 +2,10 @@
 import os,sys
 import json
 import tornado.web
+
+from datetime import datetime
+import time
+
 from sqlalchemy import and_
 from zhihui.web.extention.routing import route
 from ultrafinance.dam.sqlDAM import SqlDAM, QuoteSql
@@ -16,15 +20,21 @@ ORDER_ACTION = {'sell': 1,
                 'sell_short': 3,
                 'buy_to_cover': 4}
 
+F_TYPE = {
+    1: 'D',
+    2: 'U'
+}
+
+COLOR_TYPE ={
+    0: '#0000ff',
+    1: '#ff0000'
+}
+
 @route(r"/quotes", name="quotes")
 class QuotesHandler(tornado.web.RequestHandler):
     """
         QuotesHandler
     """
-    SELL = 'sell'
-    BUY = 'buy'
-    SELL_SHORT = 'sell_short'
-    BUY_TO_COVER = 'buy_to_cover'
 
     def get(self):
         """
@@ -61,15 +71,6 @@ class QuotesHandler(tornado.web.RequestHandler):
 
             quoterow['order'] = type
             quoterow['fractal'] = 0
-            # if i > 9:
-            #     if findUpFlag(i, _quotes):
-            #         quoterow['fractal'] = 1
-            #     elif findDownFlag(i, _quotes):
-            #         quoterow['fractal'] = 2
-            #     else:
-            #         quoterow['fractal'] = 0
-            # else:
-            #     quoterow['fractal'] = 0
 
             if i > 9:
                 if quote.time in timekeyfractals:
@@ -81,15 +82,47 @@ class QuotesHandler(tornado.web.RequestHandler):
                         type = 11
                     elif type == 2 and use == 1:
                         type = 21
-                    print type,' ',use
+                    #print type,' ',use
                     quoterow['fractal'] = type
 
             quotes.append(quoterow)
         self.write(json.dumps(quotes))
 
+@route(r"/indicators", name="indicators")
+class Indicators(tornado.web.RequestHandler):
+    """
+        Indicators
+    """
+    def get(self):
+        """
+            get
+        """
+        retData = []
+        timekeyfractals = getTimeKeyFractals()
+        fractalsData = getFractalsList()
+        for row in fractalsData:
+            retRow = {}
+            dt = time.strptime(str(row['quote']['time']), '%Y%m%d')
+            retRow['x'] = time.mktime(dt)*1000
+            retRow['y'] = row['quote']['close']
+            retRow['title'] = F_TYPE.get(row['type'])
+            retRow['text'] = "fractals " + retRow['title']
+            row = getFilteredFractalRow(row['findex'], fractalsData)
+            color_type = COLOR_TYPE[row[0]]
+            retRow['fillColor'] = color_type
+
+            retData.append(retRow)
+        self.write(json.dumps(retData))
+
+
+
+
 
 if __name__ == "__main__":
-    pass
+    test = datetime.strptime(str(20120505), "%Y%m%d")
+    print test
+    t = time.mktime(time.strptime("20120505", "%Y%m%d"))
+    print t*1000
     # flags={}
     # sqlsave = SqlSaver()
     # sqlsave.setup({'db': 'sqlite:///../../../zhihui/data/output.sqlite'}, "['EURUSD']_sma")
