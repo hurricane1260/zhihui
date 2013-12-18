@@ -9,10 +9,10 @@ class Fractal(object):
         'up': 1,
         'down': 2
     }
-    __fractals = []
 
     def __init__(self, pricetype = 'close'):
         self.__pricetype = pricetype
+        self.__fractals = []
 
     def __call__(self, quotes):
         if len(quotes) < 10:

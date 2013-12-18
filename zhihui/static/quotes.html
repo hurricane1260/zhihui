@@ -16,23 +16,21 @@
 
      <script type="text/javascript">
         $(function () {
-            var fractalData = []
-            var filteredFractalData = []
-            $.getJSON('http://127.0.0.1:8080/indicators', function (data) {
+            var allIndicatorData = []
+            $.getJSON('http://127.0.0.1:8080/indicators', function (allindicatordata) {
 
-                fractalData = data
+                allIndicatorData = allindicatordata
             })
-
-
 
             $.getJSON('http://127.0.0.1:8080/quotes', function (data) {
                 // Create the chart
-                var chartdata = []
+                var mainchartdata = []
                 var flagslinedata =  []
                 var flagsdataBuyOpen = []
                 var flagsdataBuyClose = []
                 var flagsdataSellOpen = []
                 var flagsdataSellClose = []
+                var chartDataInfo = {}
                 //var fractalData = []
 
                 function filldata(){
@@ -56,107 +54,117 @@
                             data[i].close]
 
                         skipline = false
-                        chartdata.push(temp)
+                        mainchartdata.push(temp)
 
                     }
                 }
 
-                filldata()
-                //console.log(chartdata)
-                $('#container').highcharts('StockChart', {
+                function initIndicators(){
+                    chartDataInfo = {
 
-                    rangeSelector: {
-                        selected: 1
-                    },
+                        rangeSelector: {
+                            selected: 1
+                        },
 
-                    title: {
-                        text: 'EURUSD Price'
-                    },
-                    series: [
-                        {
-                            name: 'EURUSD',
-                            type: 'candlestick',
-                            data: chartdata
+                        title: {
+                            text: 'EURUSD Price'
                         },
-                        {
-                            name : 'Result',
-                            data : flagslinedata,
-                            tooltip: {
-                                valueDecimals: 2
-                            }
-                        },
-                        {
-                            type : 'flags',
-                            data : flagsdataBuyOpen,
-                            onSeries : 'dataseries',
-                            shape : 'circlepin',
-                            color : '#5F86B3',
-				            fillColor : '#00ff00',
-				            style : {// text style
-					            color : 'white'
-				            },
-                            width : 16
-                        },
-                        {
-                            type : 'flags',
-                            data : flagsdataBuyClose,
-                            onSeries : 'dataseries',
-                            shape : 'squarepin',
-                            color : '#5F86B3',
-				            fillColor : '#00ff00',
-				            style : {// text style
-					            color : 'white'
-				            },
-                            width : 16
-                        },
-                        {
-                            type : 'flags',
-                            data : flagsdataSellOpen,
-                            onSeries : 'dataseries',
-                            shape : 'circlepin',
-                            color : '#5F86B3',
-				            fillColor : '#ff0000',
-				            style : {// text style
-					            color : 'white'
-				            },
-                            width : 16
-                        },
-                        {
-                            type : 'flags',
-                            data : flagsdataSellClose,
-                            onSeries : 'dataseries',
-                            shape : 'squarepin',
-                            color : '#5F86B3',
-				            fillColor : '#ff0000',
-				            style : {// text style
-					            color : 'white'
-				            },
-                            width : 16
-                        },
-                        {
-                            type : 'flags',
-                            data : fractalData,
-                            onSeries : 'dataseries',
-                            shape : 'squarepin',
-                            color : '#5F86B3',
-				            fillColor : '#0000ff',
-				            style : {// text style
-					            color : 'white'
-				            },
-                            point:{
-                                events: {
-                                    click:function(event){
-                                        filteredFractalData.push(this.x)
-                                        console.log(filteredFractalData)
-                                        alert(filteredFractalData)
-                                    }
+                        series: [
+                            {
+                                name: 'EURUSD',
+                                type: 'candlestick',
+                                data: mainchartdata
+                            },
+                            {
+                                name : 'Result',
+                                data : flagslinedata,
+                                tooltip: {
+                                    valueDecimals: 2
                                 }
                             },
+                            {
+                                type : 'flags',
+                                data : flagsdataBuyOpen,
+                                onSeries : 'dataseries',
+                                shape : 'circlepin',
+                                color : '#5F86B3',
+                                fillColor : '#00ff00',
+                                style : {// text style
+                                    color : 'white'
+                                },
+                                width : 16
+                            },
+                            {
+                                type : 'flags',
+                                data : flagsdataBuyClose,
+                                onSeries : 'dataseries',
+                                shape : 'squarepin',
+                                color : '#5F86B3',
+                                fillColor : '#00ff00',
+                                style : {// text style
+                                    color : 'white'
+                                },
+                                width : 16
+                            },
+                            {
+                                type : 'flags',
+                                data : flagsdataSellOpen,
+                                onSeries : 'dataseries',
+                                shape : 'circlepin',
+                                color : '#5F86B3',
+                                fillColor : '#ff0000',
+                                style : {// text style
+                                    color : 'white'
+                                },
+                                width : 16
+                            },
+                            {
+                                type : 'flags',
+                                data : flagsdataSellClose,
+                                onSeries : 'dataseries',
+                                shape : 'squarepin',
+                                color : '#5F86B3',
+                                fillColor : '#ff0000',
+                                style : {// text style
+                                    color : 'white'
+                                },
+                                width : 16
+                            }
+
+                        ]
+                    }
+
+                    for(var i = 0; i< allIndicatorData.length; i++){
+                        var indicatordata = {
+                            type : allIndicatorData[i].type,
+                            data : allIndicatorData[i].data,
+                            onSeries : 'dataseries',
+                            shape : 'squarepin',
+                            color : '#5F86B3',
+                            fillColor : '#0000ff',
+                            style : {// text style
+                                color : 'white'
+                            },
+//                            point:{
+//                                events: {
+//                                    click:function(event){
+//                                        filteredFractalData.push(this.x)
+//                                        console.log(filteredFractalData)
+//                                        alert(filteredFractalData)
+//                                    }
+//                                }
+//                            },
                             width : 16
                         }
+                        chartDataInfo.series.push(indicatordata)
+                    }
+                }
 
-                    ]
-                });
+                filldata()
+                initIndicators()
+//                console.log(chartDataInfo)
+//                console.log(fractalData)
+                $('#container').highcharts('StockChart', chartDataInfo);
             });
         });
     </script>

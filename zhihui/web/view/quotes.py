@@ -10,6 +10,7 @@ from ultrafinance.dam.sqlDAM import SqlDAM
 from ultrafinance.backTest.stateSaver.sqlSaver import SqlSaver
 from zhihui.ultrafinance.pyTaLib.fractal import Fractal
 from zhihui.tools.trainDataMaker import FractalSelectManager
+from zhihui.ultrafinance.pyTaLib.indicator import Sma
 
 
 ORDER_ACTION = {'sell': 1,
@@ -63,7 +64,12 @@ class QuotesHandler(tornado.web.RequestHandler):
         quotes = [quote.toDict() for quote in _quotes]
 
         self.write(json.dumps(quotes))
-
+'''
+Indicator Data format:
+[ {'name':'first indicator', 'type':'flags', 'data':[{'x':0,'y':0,'title':0,'text':0},...]},
+  {'name':'second indicator', 'type':'spline', 'data':[{'x':0,'y':0,'title':0,'text':0},...]},
+]
+'''
 @route(r"/indicators", name="indicators")
 class Indicators(tornado.web.RequestHandler):
     """
@@ -74,24 +80,64 @@ class Indicators(tornado.web.RequestHandler):
             get
         """
         fratal = Fractal()
-        fratalResult = fratal(getSourceData())
+        quotes = getSourceData()
+        print 'quotes: ', len(quotes)
+        fratalResult = fratal(quotes)
         fratalFilter = FractalSelectManager()
+        indicatordata = []
 
-        retData = []
+        fractalIndicator = {}
+        fractalData = []
+
         for row in fratalResult:
-            retRow = {}
+            rowdata = {}
             dt = time.strptime(str(row['time']), '%Y%m%d')
-            retRow['x'] = time.mktime(dt)*1000
-            retRow['y'] = row['price']
-            retRow['title'] = F_TYPE.get(row['type'])
-            retRow['text'] = "fractals " + retRow['title']
+            rowdata['x'] = time.mktime(dt)*1000
+            rowdata['y'] = row['price']
+            rowdata['title'] = F_TYPE.get(row['type'])
+            rowdata['text'] = "fractals " + rowdata['title']
             colortype = COLOR_TYPE[0]
             if fratalFilter.isSelected(row['time']):
                 colortype = COLOR_TYPE[1]
-            retRow['fillColor'] = colortype
+            rowdata['fillColor'] = colortype
+            fractalData.append(rowdata)
 
-            retData.append(retRow)
-        self.write(json.dumps(retData))
+        # fractl indicator
+        fractalIndicator['name'] = 'fractal'
+        fractalIndicator['type'] = 'flags'
+        fractalIndicator['data'] = fractalData
+
+        smaIndicator = {}
+        maData = []
+        sma = Sma(20)
+        count = 0
+        for quote in quotes:
+            if sma(quote.close):
+                # temp use
+                count += 1
+                if count % 3 != 0:
+                    continue
+                rowdata = {}
+                dt = time.strptime(str(quote.time), '%Y%m%d')
+                rowdata['x'] = time.mktime(dt)*1000
+                rowdata['y'] = round(sma.getLastValue(), 4)
+                rowdata['title'] = "sma 20"
+                rowdata['text'] = "sma 20 "
+                rowdata['fillColor'] = '#0000ff'
+                maData.append(rowdata)
+
+        # sma indicator
+        smaIndicator['name'] = 'sma'
+        smaIndicator['type'] = 'spline'
+        smaIndicator['data'] = maData
+
+        # add all indicators
+        indicatordata.append(fractalIndicator)
+        indicatordata.append(smaIndicator)
+        print 'fractal: ', len(fractalData), fractalData
+        print 'sma 20: ', len(maData), maData
+
+        self.write(json.dumps(indicatordata))
 
 if __name__ == "__main__":
     test = datetime.strptime(str(20120505), "%Y%m%d")
