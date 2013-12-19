@@ -67,7 +67,7 @@ class QuotesHandler(tornado.web.RequestHandler):
 '''
 Indicator Data format:
 [ {'name':'first indicator', 'type':'flags', 'data':[{'x':0,'y':0,'title':0,'text':0},...]},
-  {'name':'second indicator', 'type':'spline', 'data':[{'x':0,'y':0,'title':0,'text':0},...]},
+  {'name':'second indicator', 'type':'spline', 'data':[[time, open, high, low, close],...]},
 ]
 '''
 @route(r"/indicators", name="indicators")
@@ -109,31 +109,51 @@ class Indicators(tornado.web.RequestHandler):
 
         smaIndicator = {}
         maData = []
-        sma = Sma(20)
+        sma = Sma(5)
+
+        sma20Indicator = {}
+        ma20Data = []
+        sma20 = Sma(20)
+
         count = 0
+        count2 = 0
         for quote in quotes:
             if sma(quote.close):
                 # temp use
-                count += 1
-                if count % 3 != 0:
-                    continue
-                rowdata = {}
+                rowdata = []
                 dt = time.strptime(str(quote.time), '%Y%m%d')
-                rowdata['x'] = time.mktime(dt)*1000
-                rowdata['y'] = round(sma.getLastValue(), 4)
-                rowdata['title'] = "sma 20"
-                rowdata['text'] = "sma 20 "
-                rowdata['fillColor'] = '#0000ff'
+                rowdata.append(time.mktime(dt)*1000)
+                rowdata.append(round(sma.getLastValue(), 4))
+                rowdata.append(round(sma.getLastValue(), 4))
+                rowdata.append(round(sma.getLastValue(), 4))
+                rowdata.append(round(sma.getLastValue(), 4))
                 maData.append(rowdata)
+            if sma20(quote.close):
+                # temp use
+                rowdata = []
+                dt = time.strptime(str(quote.time), '%Y%m%d')
+                rowdata.append(time.mktime(dt)*1000)
+                rowdata.append(round(sma20.getLastValue(), 4))
+                rowdata.append(round(sma20.getLastValue(), 4))
+                rowdata.append(round(sma20.getLastValue(), 4))
+                rowdata.append(round(sma20.getLastValue(), 4))
+                ma20Data.append(rowdata)
 
         # sma indicator
-        smaIndicator['name'] = 'sma'
+        smaIndicator['name'] = 'sma 5'
         smaIndicator['type'] = 'spline'
+        smaIndicator['fillColor'] = '#0000ff'
         smaIndicator['data'] = maData
+
+        sma20Indicator['name'] = 'sma 20'
+        sma20Indicator['type'] = 'spline'
+        sma20Indicator['fillColor'] = '#ff0000'
+        sma20Indicator['data'] = ma20Data
 
         # add all indicators
         indicatordata.append(fractalIndicator)
         indicatordata.append(smaIndicator)
+        indicatordata.append(sma20Indicator)
         print 'fractal: ', len(fractalData), fractalData
         print 'sma 20: ', len(maData), maData
 

@@ -136,12 +136,13 @@
 
                     for(var i = 0; i< allIndicatorData.length; i++){
                         var indicatordata = {
+                            name : allIndicatorData[i].name,
                             type : allIndicatorData[i].type,
                             data : allIndicatorData[i].data,
                             onSeries : 'dataseries',
-                            shape : 'squarepin',
-                            color : '#5F86B3',
-                            fillColor : '#0000ff',
+                            shape : 'circlepin',
+                            color : allIndicatorData[i].fillColor,
+                            fillColor : allIndicatorData[i].fillColor,
                             style : {// text style
                                 color : 'white'
                             },
