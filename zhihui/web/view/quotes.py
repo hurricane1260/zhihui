@@ -10,8 +10,9 @@ from ultrafinance.dam.sqlDAM import SqlDAM
 from ultrafinance.backTest.stateSaver.sqlSaver import SqlSaver
 from zhihui.ultrafinance.pyTaLib.fractal import Fractal
 from zhihui.tools.trainDataMaker import FractalSelectManager
-from zhihui.ultrafinance.pyTaLib.indicator import Sma
-
+from zhihui.ultrafinance.pyTaLib.indicator import Sma, Macd, Stoch
+import numpy as np
+import copy
 
 ORDER_ACTION = {'sell': 1,
                 'buy': 2,
@@ -34,6 +35,49 @@ def getSourceData():
     dam.setSymbol('EURUSD')
     _quotes = dam.readQuotes(20000101, 20131231)
     return _quotes
+''' indicator data format:
+[ [ [open,high,low,close],..]   # one result
+  [ [open,high,low,close],..]   # two reslut
+]
+'''
+def genIndicatorData(quote, indicator, resultIndicatorData):
+    _value = indicator(quote.close)
+    if _value:
+        indicatordata = []
+        dt = time.strptime(str(quote.time), '%Y%m%d')
+        _time = time.mktime(dt)*1000
+        if isinstance(_value, list):
+            for _val in _value:
+                tmpval = _val
+                if isinstance(_val, np.ndarray):
+                    tmpval = _val[len(_val)-1]
+                rowdata = []
+                rowdata.append(_time)
+                rowdata.append(round(tmpval, 4))
+                rowdata.append(round(tmpval, 4))
+                rowdata.append(round(tmpval, 4))
+                rowdata.append(round(tmpval, 4))
+                indicatordata.append(rowdata)
+        else:
+            rowdata = []
+            rowdata.append(_time)
+            rowdata.append(round(_value, 4))
+            rowdata.append(round(_value, 4))
+            rowdata.append(round(_value, 4))
+            rowdata.append(round(_value, 4))
+            indicatordata.append(rowdata)
+
+        # construct the indicator data format
+        if len(resultIndicatorData) == 0:
+            for i in range(0, len(indicatordata)):
+                resultIndicatorData.append([])
+
+        for i in range(0, len(indicatordata)):
+            resultIndicatorData[i].append(indicatordata[i])
+
+        return resultIndicatorData
+    else:
+        return None
 
 @route(r"/quotes", name="quotes")
 class QuotesHandler(tornado.web.RequestHandler):
@@ -64,10 +108,11 @@ class QuotesHandler(tornado.web.RequestHandler):
         quotes = [quote.toDict() for quote in _quotes]
 
         self.write(json.dumps(quotes))
+
 '''
 Indicator Data format:
-[ {'name':'first indicator', 'type':'flags', 'data':[{'x':0,'y':0,'title':0,'text':0},...]},
-  {'name':'second indicator', 'type':'spline', 'data':[[time, open, high, low, close],...]},
+[ {'name':'first indicator', 'yAxis':0, 'type':'flags', 'data':[{'x':0,'y':0,'title':0,'text':0},...]},
+  {'name':'second indicator', 'yAxis':0, 'type':'spline', 'data':[[time, open, high, low, close],...]},
 ]
 '''
 @route(r"/indicators", name="indicators")
@@ -84,7 +129,7 @@ class Indicators(tornado.web.RequestHandler):
         print 'quotes: ', len(quotes)
         fratalResult = fratal(quotes)
         fratalFilter = FractalSelectManager()
-        indicatordata = []
+        allindicatordata = []
 
         fractalIndicator = {}
         fractalData = []
@@ -105,6 +150,7 @@ class Indicators(tornado.web.RequestHandler):
         # fractl indicator
         fractalIndicator['name'] = 'fractal'
         fractalIndicator['type'] = 'flags'
+        fractalIndicator['yAxis'] = 0
         fractalIndicator['data'] = fractalData
 
         smaIndicator = {}
@@ -115,49 +161,64 @@ class Indicators(tornado.web.RequestHandler):
         ma20Data = []
         sma20 = Sma(20)
 
-        count = 0
-        count2 = 0
+        macd20Indicator = {}
+        macd20Data = []
+        macd20 = Macd(20)
+
+        stoch20Indicator = {}
+        stoch20Data = []
+        stoch20 = Stoch(20)
+
         for quote in quotes:
-            if sma(quote.close):
-                # temp use
-                rowdata = []
-                dt = time.strptime(str(quote.time), '%Y%m%d')
-                rowdata.append(time.mktime(dt)*1000)
-                rowdata.append(round(sma.getLastValue(), 4))
-                rowdata.append(round(sma.getLastValue(), 4))
-                rowdata.append(round(sma.getLastValue(), 4))
-                rowdata.append(round(sma.getLastValue(), 4))
-                maData.append(rowdata)
-            if sma20(quote.close):
-                # temp use
-                rowdata = []
-                dt = time.strptime(str(quote.time), '%Y%m%d')
-                rowdata.append(time.mktime(dt)*1000)
-                rowdata.append(round(sma20.getLastValue(), 4))
-                rowdata.append(round(sma20.getLastValue(), 4))
-                rowdata.append(round(sma20.getLastValue(), 4))
-                rowdata.append(round(sma20.getLastValue(), 4))
-                ma20Data.append(rowdata)
+            genIndicatorData(quote, sma, maData)
+            genIndicatorData(quote, sma20, ma20Data)
+            genIndicatorData(quote, macd20, macd20Data)
+            genIndicatorData(quote, stoch20, stoch20Data)
 
         # sma indicator
         smaIndicator['name'] = 'sma 5'
         smaIndicator['type'] = 'spline'
         smaIndicator['fillColor'] = '#0000ff'
-        smaIndicator['data'] = maData
+        smaIndicator['yAxis'] = 0
+        smaIndicator['data'] = maData[0]
 
         sma20Indicator['name'] = 'sma 20'
         sma20Indicator['type'] = 'spline'
         sma20Indicator['fillColor'] = '#ff0000'
-        sma20Indicator['data'] = ma20Data
+        sma20Indicator['yAxis'] = 0
+        sma20Indicator['data'] = ma20Data[0]
+
+        # macd20 indicator
+        macd20Indicator['name'] = 'macd 20'
+        macd20Indicator['type'] = 'spline'
+        macd20Indicator['fillColor'] = '#ff0000'
+        macd20Indicator['yAxis'] = 1
+        macd20Indicator['data'] = macd20Data[0]
+        macd20Indicator2 = copy.copy(macd20Indicator)
+        macd20Indicator2['fillColor'] = '#00ff00'
+        macd20Indicator2['data'] = macd20Data[1]
+        macd20Indicator3 = copy.copy(macd20Indicator)
+        macd20Indicator3['fillColor'] = '#0000ff'
+        macd20Indicator3['data'] = macd20Data[2]
+
+        #stoch 20 indicator
+        stoch20Indicator['name'] = 'stoch 20'
+        stoch20Indicator['type'] = 'spline'
+        stoch20Indicator['fillColor'] = '#ff0000'
+        stoch20Indicator['yAxis'] = 2
+        stoch20Indicator['data'] = stoch20Data[0]
 
         # add all indicators
-        indicatordata.append(fractalIndicator)
-        indicatordata.append(smaIndicator)
-        indicatordata.append(sma20Indicator)
-        print 'fractal: ', len(fractalData), fractalData
-        print 'sma 20: ', len(maData), maData
+        allindicatordata.append(fractalIndicator)
+        allindicatordata.append(smaIndicator)
+        allindicatordata.append(sma20Indicator)
+        allindicatordata.append(macd20Indicator)
+        allindicatordata.append(macd20Indicator2)
+        allindicatordata.append(macd20Indicator3)
+        allindicatordata.append(stoch20Indicator)
 
-        self.write(json.dumps(indicatordata))
+        self.write(json.dumps(allindicatordata))
+
 
 if __name__ == "__main__":
     test = datetime.strptime(str(20120505), "%Y%m%d")

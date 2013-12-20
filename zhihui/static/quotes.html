@@ -61,7 +61,9 @@
 
                 function initIndicators(){
                     chartDataInfo = {
-
+                        chart:{
+                            height:400
+                        },
                         rangeSelector: {
                             selected: 1
                         },
@@ -69,10 +71,24 @@
                         title: {
                             text: 'EURUSD Price'
                         },
+                        yAxis: [
+                            {
+                                title: {
+                                        text: 'Price'
+                                },
+                                height: 300,
+                                plotLines: [{
+                                    value: 0,
+                                    width: 1,
+                                    color: '#808080'
+                                    }]
+                            }
+                        ],
                         series: [
                             {
                                 name: 'EURUSD',
-                                type: 'candlestick',
+                                type: 'line',
+                                id: 'primary',
                                 data: mainchartdata
                             },
                             {
@@ -157,8 +173,27 @@
 //                            },
                             width : 16
                         }
+                        if(allIndicatorData[i].yAxis > 0){
+                            if(allIndicatorData[i].yAxis >= chartDataInfo.yAxis.length ){
+                                var yaxis = {
+                                        title: {
+                                            text: allIndicatorData[i].name
+                                        },
+                                        top: chartDataInfo.chart.height,
+                                        height: 100,
+                                        offset: 0,
+                                        lineWidth: 2
+                                    }
+
+                                chartDataInfo.chart.height += 120
+                                chartDataInfo.yAxis.push(yaxis)
+                            }
+                            indicatordata.yAxis = allIndicatorData[i].yAxis
+                        }
+
                         chartDataInfo.series.push(indicatordata)
                     }
+                    chartDataInfo.chart.height += 100
                 }
 
                 filldata()
