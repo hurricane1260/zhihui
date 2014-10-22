@@ -5,6 +5,11 @@ import tornado.web
 
 from datetime import datetime
 import time
+try:
+    import zhihui
+except ImportError:
+    sys.path.append(os.path.join(os.path.dirname(__file__), "../../.."))
+
 from zhihui.web.extention.routing import Route
 from ultrafinance.dam.sqlDAM import SqlDAM
 from ultrafinance.backTest.stateSaver.sqlSaver import SqlSaver
