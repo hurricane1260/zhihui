@@ -17,12 +17,12 @@
      <script type="text/javascript">
         $(function () {
             var allIndicatorData = []
-            $.getJSON('http://127.0.0.1:8080/indicators', function (allindicatordata) {
+            $.getJSON('http://wwww.weijulian.com:8888/indicators', function (allindicatordata) {
 
                 allIndicatorData = allindicatordata
             })
 
-            $.getJSON('http://127.0.0.1:8080/quotes', function (data) {
+            $.getJSON('http://wwww.weijulian.com:8888/mysqlQuotes', function (data) {
                 // Create the chart
                 var mainchartdata = []
                 var flagslinedata =  []

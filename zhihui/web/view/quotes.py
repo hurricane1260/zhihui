@@ -13,6 +13,8 @@ from zhihui.tools.trainDataMaker import FractalSelectManager
 from zhihui.ultrafinance.pyTaLib.indicator import Sma, Macd, Stoch
 import numpy as np
 import copy
+import MySQLdb
+
 
 ORDER_ACTION = {'sell': 1,
                 'buy': 2,
@@ -78,6 +80,54 @@ def genIndicatorData(quote, indicator, resultIndicatorData):
         return resultIndicatorData
     else:
         return None
+
+def getMysqlStockData():
+    # 打开数据库连接
+    db = MySQLdb.connect("localhost","root","ty200","stock_db" )
+
+    # 使用cursor()方法获取操作游标 
+    cursor = db.cursor()
+
+    quotes = []
+    # SQL 查询语句
+    sql = "SELECT Date,Open,High,Low,Close,Volume,Adjusted FROM stock_data "
+    try:
+        # 执行SQL语句
+        cursor.execute(sql)
+        # 获取所有记录列表
+        
+        results = cursor.fetchall()
+        for row in results:
+            quote ={}
+            quote['time'] = row[0]
+            quote['open'] = row[1]
+            quote['high'] = row[2]
+            quote['low'] = row[3]
+            quote['close'] = row[4]
+            quote['volume'] = row[5]
+            quote['adjusted'] = row[6]
+            # 打印结果
+            print quote
+    except:
+        print "Error: unable to fecth data"
+
+    # 关闭数据库连接
+    db.close()
+    return quotes
+
+@route(r"/mysqlQuotes", name="mysqlQuotes")
+class QuotesHandler(tornado.web.RequestHandler):
+    """
+        QuotesHandler
+    """
+
+    def get(self):
+        """
+            get quotes
+        """   
+        quotes = getMysqlStockData()
+
+        self.write(json.dumps(quotes))
 
 @route(r"/quotes", name="quotes")
 class QuotesHandler(tornado.web.RequestHandler):
