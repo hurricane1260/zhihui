@@ -124,11 +124,12 @@ class MysqlQuotesHandler(tornado.web.RequestHandler):
 
     def get(self):
         """
-            get quotes
+            get mysqlQuotes
         """   
-        quotes = getMysqlStockData()
+        #quotes = getMysqlStockData()
 
-        self.write(json.dumps(quotes))
+        #self.write(json.dumps(quotes))
+        self.write("hello ok!")
 
 @route(r"/quotes", name="quotes")
 class QuotesHandler(tornado.web.RequestHandler):

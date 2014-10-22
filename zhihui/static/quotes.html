@@ -47,7 +47,8 @@
                         var day = dateStr.slice(6,8)
 
                         var temp = [
-                            Date.parse(year+"/"+month+"/"+day+" 00:00:00"),
+                            // Date.parse(year+"/"+month+"/"+day+" 00:00:00"),
+                            Date.parse(year+"-"+month+"-"+day+" 00:00:00"),
                             data[i].open,
                             data[i].high,
                             data[i].low,
