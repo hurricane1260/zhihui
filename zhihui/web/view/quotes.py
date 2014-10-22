@@ -5,7 +5,7 @@ import tornado.web
 
 from datetime import datetime
 import time
-from zhihui.web.extention.routing import route
+from zhihui.web.extention.routing import Route
 from ultrafinance.dam.sqlDAM import SqlDAM
 from ultrafinance.backTest.stateSaver.sqlSaver import SqlSaver
 from zhihui.ultrafinance.pyTaLib.fractal import Fractal
