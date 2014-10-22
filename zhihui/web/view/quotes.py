@@ -273,7 +273,9 @@ class Indicators(tornado.web.RequestHandler):
 
 
 if __name__ == "__main__":
-    test = datetime.strptime(str(20120505), "%Y%m%d")
-    print test
-    t = time.mktime(time.strptime("20120505", "%Y%m%d"))
-    print t*1000
+    data = getMysqlStockData()
+    print data
+    # test = datetime.strptime(str(20120505), "%Y%m%d")
+    # print test
+    # t = time.mktime(time.strptime("20120505", "%Y%m%d"))
+    # print t*1000
