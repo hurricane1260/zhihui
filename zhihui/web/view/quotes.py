@@ -37,6 +37,7 @@ def getSourceData():
     dam.setSymbol('EURUSD')
     _quotes = dam.readQuotes(20000101, 20131231)
     return _quotes
+
 ''' indicator data format:
 [ [ [open,high,low,close],..]   # one result
   [ [open,high,low,close],..]   # two reslut
@@ -116,9 +117,9 @@ def getMysqlStockData():
     return quotes
 
 @route(r"/mysqlQuotes", name="mysqlQuotes")
-class QuotesHandler(tornado.web.RequestHandler):
+class MysqlQuotesHandler(tornado.web.RequestHandler):
     """
-        QuotesHandler
+        MysqlQuotesHandler
     """
 
     def get(self):
